@@ -26,6 +26,7 @@ final _form = GlobalKey<FormState>();
   var _isLogin = true;
   var _enteredEmail = '';
   var _enteredPassword ='';
+  var _enteredUsername = '';
   File? _selectedImage;
   var _isAuthenticating = false;
 
@@ -67,7 +68,7 @@ final _form = GlobalKey<FormState>();
       .collection('users')
       .doc(userCredentials.user!.uid)
       .set({
-        'username': 'to be done...',
+        'username': _enteredUsername,
         'email': _enteredEmail,
         'imageurl':ImageUrl});
       
@@ -81,9 +82,7 @@ final _form = GlobalKey<FormState>();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message?? 'Authentication Failed.'),
         ),
       );
-      } catch (e) {
-      print('exception');
-      }
+      } 
       setState(() {
         _isAuthenticating = false;
       });
@@ -140,6 +139,22 @@ final _form = GlobalKey<FormState>();
                             _enteredEmail =value!;
                           },
                         ),
+                         if(!_isLogin)
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Username'
+                          ),
+                          enableSuggestions: false,
+                          validator: (value){
+                            if (value == null || value.isEmpty|| value.trim().length<4){
+                              return 'Please enter a  valid username ( at least 4 character)';
+                            }
+                            return null;
+                          },
+                          onSaved: (value){
+                            _enteredUsername = value!;
+                          },
+                        ),
                         TextFormField(
                           decoration: const InputDecoration(
                             labelText: 'Password'
@@ -156,6 +171,7 @@ final _form = GlobalKey<FormState>();
                             _enteredPassword =value!;
                           },
                         ),
+                        
                         const SizedBox(height: 12),
                         if(_isAuthenticating)
                           const CircularProgressIndicator(),
@@ -165,9 +181,10 @@ final _form = GlobalKey<FormState>();
                           style: ElevatedButton.styleFrom(
                             backgroundColor:Theme.of(context).colorScheme.primaryContainer
                           ),
+
                           child: Text(_isLogin ? 'Login' : 'SignUp'),
                           ),
-                          if(_isAuthenticating)
+                          
                           TextButton(
                             onPressed: (){
                               setState(() {
